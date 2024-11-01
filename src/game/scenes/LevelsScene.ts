@@ -327,9 +327,9 @@
         }
         updateBallStationaryStatus() {
             if (this.ballView) {
-                const ballVelocity = this.ballView.phaserObject.body.velocity;
+                const ballVelocity = this.ballView.phaserObject.body;
     
-                if (Math.abs(ballVelocity.x) < VELOCITY_THRESHOLD && Math.abs(ballVelocity.y) < VELOCITY_THRESHOLD) {
+                if (ballVelocity && Math.abs(ballVelocity.x) < VELOCITY_THRESHOLD && Math.abs(ballVelocity.y) < VELOCITY_THRESHOLD) {
                     if (!this.pressIndicator) {
                         this.pressIndicator = this.add.image(
                             this.ballView.phaserObject.x,
