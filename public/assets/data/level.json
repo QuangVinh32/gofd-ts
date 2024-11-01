@@ -1,0 +1,31 @@
+[
+    {
+      "levelId": 1,
+      "levelNumber": 1,
+      "width": 1800,
+      "height": 900,
+      "columns": 6,
+      "rows": 3,
+      "origin": { "x": 0, "y": 0 }
+    },
+    {
+      "levelId": 2,
+      "levelNumber": 2,
+      "width": 1800,
+      "height": 900,
+      "columns": 6,
+      "rows": 3,
+      "origin": { "x": 0, "y": 0 }
+    },
+    {
+      "levelId": 3,
+      "levelNumber": 3,
+      "width": 1800,
+      "height": 900,
+      "columns": 6,
+      "rows": 3,
+      "origin": { "x": 0, "y": 0 }
+    }
+      
+  ]
+  

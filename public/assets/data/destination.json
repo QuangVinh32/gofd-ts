@@ -1,0 +1,30 @@
+{
+    "destinations": [
+        {
+            "id": 1,
+            "positionX": 1053,
+            "positionY": 346,
+            "radius": 6,
+            "origin": {"x": 0, "y": 0},
+            "shape": "circle",
+            "levelNumber": 1
+        },
+        {
+            "id": 2,
+            "positionX": 1183,
+            "positionY": 448,
+            "radius": 6,
+            "origin": {"x": 0, "y": 0},
+            "shape": "circle",
+            "levelNumber": 2
+        },  {
+            "id": 3,
+            "positionX": 1302,
+            "positionY": 160,
+            "radius": 6,
+            "origin": {"x": 0, "y": 0},
+            "shape": "circle",
+            "levelNumber": 3
+        }
+    ]
+}

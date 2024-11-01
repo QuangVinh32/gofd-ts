@@ -1,0 +1,273 @@
+import Phaser from 'phaser';
+import BallService from '../Services/BallService';
+import DestinationService from '../Services/DestinationService';
+import ObstacleService from '../Services/ObstacleService';
+import LevelService from '../Services/LevelService'; // Import LevelService
+import UIScene from './UIScene';
+
+export class LevelsScene extends Phaser.Scene {
+    private levelService: LevelService | null;
+    private levelNumber: number;
+    private launchCount: number;
+    private ballService: BallService | null;
+    private arrow: Phaser.GameObjects.Image | null;
+    private line: Phaser.GameObjects.Line | null;
+    private cameraFollowingBall: boolean;
+    private destinationService: DestinationService | null;
+    private obstacleService: ObstacleService | null;
+    private ballHitSound: Phaser.Sound.BaseSound | null;
+    private starSound: Phaser.Sound.BaseSound | null;
+    private levelWinSound: Phaser.Sound.BaseSound | null;
+    private isDraggingBall: boolean;
+    private startX: number;
+    private startY: number;
+    private dragStartPos: { x: number; y: number };
+    private score: number;
+    private ballView: any;
+    private destinationView: any;
+
+    constructor() {
+        super("Levels");
+        this.levelNumber = 1;
+        this.levelService = null;
+        this.ballService = null;
+        this.line = null;
+        this.cameraFollowingBall = false;
+        this.destinationService = null;
+        this.obstacleService = null;
+        this.ballHitSound = null;
+        this.starSound = null;
+        this.levelWinSound = null;
+        this.isDraggingBall = false;
+        this.startX = 0;
+        this.startY = 0;
+        this.score = 1200;
+    }
+
+    init(data: { levelNumber?: number }) {
+        this.levelNumber = data.levelNumber || 1;
+    }
+
+    preload() {
+        this.loadAssets();
+    }
+
+    async create() {
+        this.launchCount = 0;
+        this.score = 1200;
+        
+        this.levelService = new LevelService(this, 'assets/data/level.json');
+        await this.levelService.initialize(this.levelNumber); // Nạp dữ liệu cấp độ
+
+        const levelView = this.levelService.getLevelViewById(this.levelNumber); // Lấy giao diện cấp độ từ dịch vụ
+
+        if (levelView) {
+            const canvasSize = levelView.calculateCanvasSize();
+            this.cameras.main.setBounds(0, 0, canvasSize.width, canvasSize.height);
+
+            levelView.createBackground(); // Sử dụng phương thức của LevelView để tạo nền cấp độ
+        }
+
+        this.ballService = new BallService(this, "assets/data/ball.json");
+        await this.ballService.initialize(this.levelNumber); 
+        this.ballHitSound = this.sound.add("hit_ball");
+        
+        this.destinationService = new DestinationService(this, 'assets/data/destination.json');
+        await this.destinationService.initialize(this.levelNumber);
+        
+        this.obstacleService = new ObstacleService(this, "assets/data/obstacle.json");
+        await this.obstacleService.initialize(this.levelNumber);
+
+        this.starSound = this.sound.add("star");
+        this.levelWinSound = this.sound.add("win_level");
+
+        this.setupFlags();
+        this.setupCameraInteractions();
+        this.cameras.main.setZoom(1.5);
+    }
+
+    loadAssets() {
+        for (let i = 1; i <= 18; i++) {
+            this.load.image(`level${this.levelNumber}_${i}`, `assets/images/level${this.levelNumber}/bg_piece_${i.toString().padStart(2, '0')}.png`);
+        }
+        this.load.image("ball", "assets/images/ball.png");
+        this.load.image("flag", "assets/images/flag.png");
+        this.load.image("arrow", "assets/images/arrow.png");
+        this.load.audio("hit_ball", "assets/audio/hit_ball.mp3");
+        this.load.audio("win_level","assets/audio/win_level.mp3");
+        this.load.audio("star","assets/audio/star.mp3");
+    }
+
+    setupFlags() {
+        const flagPositions = this.getFlagPositions(this.levelNumber);
+        flagPositions.forEach(pos => {
+            const flag = this.add.image(pos.x, pos.y, "flag").setDisplaySize(30, 50);
+
+        });
+    }
+     
+    getFlagPositions(level: number): { x: number; y: number }[] {
+        const flagPositions: {
+            default: { x: number; y: number; }[]; [key: number]: { x: number; y: number }[] 
+} = {
+            1: [{ x: 1160, y: 322 }, { x: 1073, y: 275 }],
+            2: [{ x: 1262, y: 410 }, { x: 1163, y: 455 }],
+            3: [{ x: 500, y: 400 }, { x: 450, y: 350 }],
+            default: [{ x: 100, y: 100 }, { x: 150, y: 150 }]
+        };
+        return flagPositions[level] || flagPositions.default;
+    }
+
+
+        setupBallInteraction(phaserBall: Phaser.GameObjects.Image) {
+            phaserBall.setInteractive();
+            this.input.setDraggable(phaserBall);
+            this.input.on('dragstart', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) => {
+                this.onDragStart(pointer, gameObject);
+                this.isDraggingBall = true; 
+            });
+        
+            this.input.on('drag', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) => {
+                this.onDrag(pointer, gameObject);
+            });
+        
+            this.input.on('dragend', (pointer: Phaser.Input.Pointer, gameObject: any) => {
+                this.onDragEnd(pointer, gameObject);
+                this.isDraggingBall = false; 
+            });
+
+        }
+        onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) {
+            this.isDraggingBall = true; 
+            this.dragStartPos = { x: gameObject.x, y: gameObject.y };
+            
+            const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+            this.arrow = this.add.image(gameObject.x, gameObject.y, 'arrow').setOrigin(0.5, 0.5);
+            this.arrow.setDisplaySize(60, 8);
+            
+            this.line = this.add.line(0, 0, gameObject.x, gameObject.y, worldPoint.x, worldPoint.y, 0xFF0000);
+            this.line.setLineWidth(2);
+        
+            this.cameras.main.stopFollow();
+        }
+        onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) {
+            const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+            
+            if (this.line) {
+                this.line.setTo(gameObject.x, gameObject.y, worldPoint.x, worldPoint.y);
+            }
+            if (this.arrow) {
+                const dx = worldPoint.x - gameObject.x;
+                const dy = worldPoint.y - gameObject.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                const arrowLength = 28; 
+                
+                const arrowX = gameObject.x - (dx / distance) * arrowLength;
+                const arrowY = gameObject.y - (dy / distance) * arrowLength;
+
+                this.arrow.setPosition(arrowX, arrowY);
+                
+                const angle = Phaser.Math.Angle.Between(gameObject.x, gameObject.y, worldPoint.x, worldPoint.y);
+                
+                this.arrow.setRotation(angle + Math.PI);
+        }
+        }
+        onDragEnd(pointer: Phaser.Input.Pointer, gameObject:LaunchableSprite) {
+            this.isDraggingBall = false;
+        
+            const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+            const directionX = worldPoint.x - gameObject.x;
+            const directionY = worldPoint.y - gameObject.y;
+        
+            const velocityX = -directionX * 0.2;
+            const velocityY = -directionY * 0.2;
+        
+            if (gameObject.body) {
+                gameObject.setVelocity(velocityX, velocityY);
+            }
+        
+            this.cameraFollowingBall = true;
+            this.cameras.main.startFollow(gameObject);
+
+            this.score -= 100; 
+            console.log(`Launch count: ${gameObject.launch}`);
+            console.log(`Score: ${this.score}`); 
+        
+            if (!gameObject.launch) {
+                gameObject.launch = 0;
+            }
+            gameObject.launch += 1;
+            console.log(`Launch count: ${gameObject.launch}`);
+        
+            const uiScene = this.scene.get('uiScene') as UIScene;
+            if (uiScene) {
+                uiScene.updateLaunchCount(gameObject.launch);
+            }
+        
+            if (this.line) {
+                this.line.destroy();
+                this.line = null;
+            }
+            if (this.arrow) {
+                this.arrow.destroy(); 
+                this.arrow = null;
+            }
+        
+            this.ballHitSound?.play();
+        } 
+        setupCameraInteractions() {
+            this.input.on('pointerdown', (pointer: { x: number; y: number; }) => {
+                if (!this.isDraggingBall) { 
+                    this.startX = pointer.x;
+                    this.startY = pointer.y;
+                }
+            });
+        
+            this.input.on('pointermove', (pointer: { isDown: any; }) => {
+                if (pointer.isDown) {
+                    if (!this.isDraggingBall) { 
+                        this.handleCameraMovement(pointer);
+                    }
+                }
+            });
+        } 
+        handleCameraMovement(pointer: { isDown?: any; x?: any; y?: any; }) {
+            const dx = pointer.x - this.startX;
+            const dy = pointer.y - this.startY;
+            const camera = this.cameras.main;
+        
+            camera.scrollX -= dx / camera.zoom;
+            camera.scrollY -= dy / camera.zoom;
+        
+            this.startX = pointer.x;
+            this.startY = pointer.y;
+        
+            if (this.cameraFollowingBall) {
+                this.cameras.main.stopFollow();
+                this.cameraFollowingBall = false;
+            }   
+        }
+        onLevelComplete(): void {
+            const score = this.calculateScore(); 
+            const launchCount = this.getLaunchCount(); 
+            const stars = this.calculateStars();
+            this.starSound?.play();
+            this.levelWinSound?.play();
+            this.scene.launch("scoreboard", { score, launchCount, levelNumber: this.levelNumber, stars });
+        }
+        calculateScore(): number {
+            return this.score;
+        }
+        getLaunchCount(): number {
+            return this.launchCount; 
+        }
+        calculateStars(): number {
+            if (this.score >= 1000) {
+                return 3; 
+            } else if (this.score >= 500) {
+                return 2; 
+            }
+            return 1;
+        }
+    }
