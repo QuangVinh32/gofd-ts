@@ -4,8 +4,6 @@
     import LevelService from '../Services/LevelService';
     import ObstacleService from '../Services/ObstacleService';
     import UIScene from './UIScene';
-
-    const VELOCITY_THRESHOLD = 0.001;
     export class LevelsScene extends Phaser.Scene {
         private levelService: LevelService | null;
         private levelNumber: number;
@@ -28,6 +26,8 @@
         private score: number;
         private ballView: any;  
         private destinationView: any; 
+        private static readonly VELOCITY_THRESHOLD = 0.001;
+
         isTweening: boolean;
         constructor() {
             super("Levels");
@@ -55,7 +55,7 @@
             this.isTweening = false; 
 
             this.time.addEvent({
-                delay: 1000, // 1 giây (1000 ms)
+                delay: 1000,
                 callback: () => {
                     if (this.pressIndicator && !this.isTweening) {
                         this.isTweening = true; 
@@ -131,8 +131,6 @@
                 });
             });
             this.events.on('update', this.updateBallStationaryStatus, this);
-
-
             this.setupFlags();
             this.setupCameraInteractions();
             this.cameras.main.setZoom(1.5);
@@ -247,7 +245,6 @@
         }
         onDragEnd(pointer: Phaser.Input.Pointer, gameObject:LaunchableSprite) {
             this.isDraggingBall = false;
-            // this.pressIndicator = this.add.image(gameObject.x, gameObject.y, 'press_indicator').setOrigin(0.5, 0.5).setDisplaySize(10,10);
         
             const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
             const directionX = worldPoint.x - gameObject.x;
@@ -326,23 +323,30 @@
             }   
         }
         updateBallStationaryStatus() {
-            if (this.ballView) {
-                const ballVelocity = this.ballView.phaserObject.body;
+            if (this.ballView && this.ballView.phaserObject) {
+                const ballBody = this.ballView.matterBody;
     
-                if (ballVelocity && Math.abs(ballVelocity.x) < VELOCITY_THRESHOLD && Math.abs(ballVelocity.y) < VELOCITY_THRESHOLD) {
-                    if (!this.pressIndicator) {
-                        this.pressIndicator = this.add.image(
-                            this.ballView.phaserObject.x,
-                            this.ballView.phaserObject.y,
-                            'press_indicator'
-                        ).setDisplaySize(10, 10).setOrigin(0.5, 0.5);
+                if (ballBody) {
+                    const ballVelocity = ballBody.velocity;
+    
+                    if (Math.abs(ballVelocity.x) < LevelsScene.VELOCITY_THRESHOLD && Math.abs(ballVelocity.y) < LevelsScene.VELOCITY_THRESHOLD) {
+                        if (!this.pressIndicator) {
+                            this.pressIndicator = this.add.image(
+                                this.ballView.phaserObject.x,
+                                this.ballView.phaserObject.y,
+                                'press_indicator'
+                            ).setDisplaySize(10, 10).setOrigin(0.5, 0.5);
+                        }
+                        this.pressIndicator.setPosition(this.ballView.phaserObject.x, this.ballView.phaserObject.y);
+                        this.pressIndicator.setVisible(true);
+                    } else {
+                        this.pressIndicator?.setVisible(false);
                     }
-                    this.pressIndicator.setPosition(this.ballView.phaserObject.x, this.ballView.phaserObject.y);
-                    this.pressIndicator.setVisible(true);
                 } else {
-                    // Hide pressIndicator when the ball is moving
-                    this.pressIndicator?.setVisible(false);
+                    console.warn("Body is undefined for phaserObject");
                 }
+            } else {
+                console.warn("ballView or phaserObject is undefined");
             }
         }
         onLevelComplete(): void {
@@ -352,10 +356,10 @@
             this.starSound?.play();
             this.levelWinSound?.play();
             this.scene.launch("scoreboard", { score, launchCount, levelNumber: this.levelNumber, stars });
-            if (this.pressIndicator) {
-                this.pressIndicator.setPosition(this.ballView.phaserObject.x, this.ballView.phaserObject.y);
-                this.pressIndicator.setVisible(true);
-            }
+            // if (this.pressIndicator) {
+            //     this.pressIndicator.setPosition(this.ballView.phaserObject.x, this.ballView.phaserObject.y);
+            //     this.pressIndicator.setVisible(true);
+            // }
         }
         calculateScore(): number {
             return this.score;
