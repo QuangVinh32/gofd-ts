@@ -38,7 +38,6 @@ export default class ObstacleView extends Phaser.GameObjects.Container {
             angle: angle,
             isStatic: isStatic,
             restitution: restitution,
-            // density: 500000 // Increase mass
         });
     }
 

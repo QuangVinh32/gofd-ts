@@ -22,14 +22,15 @@
         "typescript"
     ],
     "scripts": {
-        "dev": "node log.js dev & next dev -p 3000",
+        "dev": "node log.js dev & next dev -p 3001",
         "build": "node log.js build & next build",
-        "dev-nolog": "next dev -p 3000",
-        "build-nolog": "next build"
+        "dev-nolog": "next dev -p 3001",
+        "build-nolog": "next build",
+        "export": "next build && next export"
     },
     "dependencies": {
         "matter-js": "^0.20.0",
-        "next": "14.2.3",
+        "next": "^14.2.16",
         "phaser": "^3.85.2",
         "react": "^18",
         "react-dom": "^18.3.1"
@@ -39,6 +40,7 @@
         "@types/node": "^20",
         "@types/react": "^18",
         "@types/react-dom": "^18",
+        "eslint": "^9.13.0",
         "typescript": "^5"
     }
 }

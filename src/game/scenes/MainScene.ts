@@ -8,6 +8,7 @@ class MainScene extends Scene {
   private menuTextWorld!: GameObjects.Image; 
   private continueButton!: GameObjects.Image; 
   private playButton!: GameObjects.Image; 
+  private levelNumber: number;
   constructor() {
       super("playGame");
   }
@@ -23,6 +24,10 @@ class MainScene extends Scene {
           frameHeight: 128,
       });
   }
+        init(data: { levelNumber?: number }) {
+            this.levelNumber = data.levelNumber || 1;
+            console.log("play", this.levelNumber);
+        }
 
   async create(): Promise<void> {
       this.bgMenu = this.add.image(0, 0, 'bg_menu').setOrigin(0, 0).setDisplaySize(this.game.config.width as number, this.game.config.height as number);
@@ -83,6 +88,7 @@ class MainScene extends Scene {
               this.cameras.main.fadeOut(250);
               this.cameras.main.once('camerafadeoutcomplete', () => {
               this.scene.start(sceneKey);
+              this.scene.stop("playGame")
               console.log("1")
               });
           }

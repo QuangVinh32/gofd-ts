@@ -7,6 +7,7 @@ import { LevelsScene } from './scenes/LevelsScene';
 import UIScene from './scenes/UIScene';
 import { ScoreboardScene } from './scenes/ScoreboardScene';
 import EditorPolygon from './Editor/EditorPolygon';
+import ChoiceScene from './scenes/ChoiceScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
@@ -29,6 +30,7 @@ const config: Phaser.Types.Core.GameConfig = {
         Boot,
         LoadingScene,
         MenuLevelScene,
+        ChoiceScene,
         LevelsScene,
         EditorPolygon,
         MainScene,

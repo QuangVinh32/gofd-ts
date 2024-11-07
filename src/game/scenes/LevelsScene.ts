@@ -27,6 +27,8 @@
         private ballView: any;  
         private destinationView: any; 
         private static readonly VELOCITY_THRESHOLD = 0.001;
+        static PRESS_INDICATOR_IMAGE = 'press_indicator';
+
 
         isTweening: boolean;
         constructor() {
@@ -61,13 +63,19 @@
                         this.isTweening = true; 
                         this.tweens.add({
                             targets: this.pressIndicator,
-                            scaleY: 0.25,
-                            scaleX: 0.25,
+                            scaleX: 0.3,
+                            scaleY: 0.3, 
+                            alpha: 0,
                             ease: 'Power1',
-                            duration: 300,
-                            yoyo: true,
+                            duration: 700,
+                            yoyo: false,
                             repeat: 0,
                             onComplete: () => {
+                                if (this.pressIndicator) {
+                                    // console.log(this.pressIndicator);
+                                    this.pressIndicator.setAlpha(0.5);
+                                    this.pressIndicator.setScale(0.1);
+                                }
                                 this.isTweening = false;
                             }
                         });
@@ -75,6 +83,8 @@
                 },
                 loop: true
             });
+            
+            
             
             this.launchCount = 0;
             this.score = 1200; 
@@ -84,10 +94,11 @@
             const levelView = this.levelService.getLevelViewById(this.levelNumber); 
 
             if (levelView) {
+
                 const canvasSize = levelView.calculateCanvasSize();
                 this.cameras.main.setBounds(0, 0, canvasSize.width, canvasSize.height);
 
-                levelView.createBackground(); // 
+                levelView.createBackground();
             }
 
             this.ballService = new BallService(this, "assets/data/ball.json");
@@ -97,14 +108,20 @@
             const ballDTO = this.ballService.getBallDTOById(this.levelNumber);
             if (ballDTO) {
                 this.ballView = this.ballService.getBallViewById(this.levelNumber);
-                if (this.ballView) {
+                console.log("ballView",this.ballView)
+                if (this.ballView?.phaserObject) {
                     this.ballView.launch = 0; 
                     this.score = 1200;
                     this.followBall(this.ballView.phaserObject);
                     this.ballView.phaserObject.setFixedRotation();
+                    console.log("bvo1111111",this.ballView.phaserObject)
+                 
 
                 }
-            } 
+            }
+            else {
+                console.warn("ballView.phaserObject is undefined.");
+            }
             this.destinationService = new DestinationService(this, 'assets/data/destination.json');
             await this.destinationService.initialize(this.levelNumber);
             const DestinationDTO = this.destinationService.getDestinationDTOById(this.levelNumber);
@@ -121,16 +138,27 @@
             this.matter.world.on('collisionstart', (event: MatterJS.IEventCollision<any>) => {
                 event.pairs.forEach((pair: any) => {
                     const { bodyA, bodyB } = pair;
+                    console.log("body=a",bodyA);
+                    console.log("body=b",bodyB);
+
+                    console.log("1",this.ballView.matterBody);
+                    console.log("2",this.destinationView.matterBody);
+
+                    // console.log("1ob",this.ballView.phaserObject.x);
+                    // console.log("2ob",this.destinationView.phaserObject);
+
                     if (this.ballView && this.destinationView &&
                         ((bodyA === this.ballView.matterBody && bodyB === this.destinationView.matterBody) ||
-                        (bodyA === this.destinationView.matterBody && bodyB === this.ballView.matterBody))) 
+                        (bodyA === this.destinationView.matterBody && bodyB === this.ballView.matterBody    ))) 
+                    
                     {
                             this.onLevelComplete();
 
                     }
                 });
             });
-            this.events.on('update', this.updateBallStationaryStatus, this);
+            // this.updateBallStationaryStatus();
+        
             this.setupFlags();
             this.setupCameraInteractions();
             this.cameras.main.setZoom(1.5);
@@ -201,11 +229,10 @@
 
             this.arrow = this.add.image(gameObject.x, gameObject.y, 'arrow').setOrigin(0.5, 0.5).setDisplaySize(50,8);
 
-            // if (this.pressIndicator) {
-            //     this.pressIndicator.destroy(); // Hủy pressIndicator khi bắt đầu kéo bóng
-            //     this.pressIndicator = null;
-            // }
-            
+            this.arrowFill = this.add.image(gameObject.x, gameObject.y, 'arrow_fill')
+                .setOrigin(0.5, 0.5)
+                .setDisplaySize(50, 8)
+      
             this.line = this.add.line(0, 0, gameObject.x, gameObject.y, worldPoint.x, worldPoint.y, 0xFF0000);
             this.line.setLineWidth(2);
         
@@ -219,33 +246,31 @@
                 const dy = worldPoint.y - gameObject.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                     
-                const offsetDistance = 6; 
+                const offsetDistance = 7; 
 
                 const startX = gameObject.x + (dx / distance) * offsetDistance;
                 const startY = gameObject.y + (dy / distance) * offsetDistance;
         
                 this.line.setTo(startX, startY, worldPoint.x, worldPoint.y);
             }
-            if (this.arrow) {
-                const dx = worldPoint.x - gameObject.x;
-                const dy = worldPoint.y - gameObject.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                const arrowLength = 28; 
-                
-                const arrowX = gameObject.x - (dx / distance) * arrowLength;
-                const arrowY = gameObject.y - (dy / distance) * arrowLength;
+            if (this.arrow && this.arrowFill) {
+            const dx = worldPoint.x - gameObject.x;
+            const dy = worldPoint.y - gameObject.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-                this.arrow.setPosition(arrowX, arrowY);
-                
-                const angle = Phaser.Math.Angle.Between(gameObject.x, gameObject.y, worldPoint.x, worldPoint.y);
-                
-                this.arrow.setRotation(angle + Math.PI);
+            const arrowLength = 25;
+            const arrowX = gameObject.x - (dx / distance) * arrowLength;
+            const arrowY = gameObject.y - (dy / distance) * arrowLength;
+            const angle = Phaser.Math.Angle.Between(gameObject.x, gameObject.y, worldPoint.x, worldPoint.y);
+
+            this.arrow.setPosition(arrowX, arrowY).setRotation(angle + Math.PI);
+
+            this.arrowFill.setPosition(arrowX, arrowY).setRotation(angle + Math.PI);
         }
         }
         onDragEnd(pointer: Phaser.Input.Pointer, gameObject:LaunchableSprite) {
             this.isDraggingBall = false;
-        
+
             const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
             const directionX = worldPoint.x - gameObject.x;
             const directionY = worldPoint.y - gameObject.y;
@@ -288,6 +313,10 @@
                 this.arrow.destroy(); 
                 this.arrow = null;
             }
+            if (this.arrowFill ){
+                this.arrowFill.destroy(); 
+                this.arrowFill = null;
+            }
             this.ballHitSound?.play();
         } 
         setupCameraInteractions() {
@@ -322,8 +351,9 @@
                 this.cameraFollowingBall = false;
             }   
         }
+ 
         updateBallStationaryStatus() {
-            if (this.ballView && this.ballView.phaserObject) {
+            if (this.ballView && this.ballView.phaserObject instanceof Phaser.GameObjects.Image) {
                 const ballBody = this.ballView.matterBody;
     
                 if (ballBody) {
@@ -334,9 +364,12 @@
                             this.pressIndicator = this.add.image(
                                 this.ballView.phaserObject.x,
                                 this.ballView.phaserObject.y,
-                                'press_indicator'
+                                LevelsScene.PRESS_INDICATOR_IMAGE
                             ).setDisplaySize(10, 10).setOrigin(0.5, 0.5);
                         }
+                        console.log("bvo22222222",this.ballView.phaserObject)
+
+    
                         this.pressIndicator.setPosition(this.ballView.phaserObject.x, this.ballView.phaserObject.y);
                         this.pressIndicator.setVisible(true);
                     } else {
@@ -347,8 +380,11 @@
                 }
             } else {
                 console.warn("ballView or phaserObject is undefined");
+                this.pressIndicator?.setVisible(false);
+
             }
         }
+        
         onLevelComplete(): void {
             const score = this.calculateScore(); 
             const launchCount = this.getLaunchCount(); 
@@ -356,10 +392,7 @@
             this.starSound?.play();
             this.levelWinSound?.play();
             this.scene.launch("scoreboard", { score, launchCount, levelNumber: this.levelNumber, stars });
-            // if (this.pressIndicator) {
-            //     this.pressIndicator.setPosition(this.ballView.phaserObject.x, this.ballView.phaserObject.y);
-            //     this.pressIndicator.setVisible(true);
-            // }
+
         }
         calculateScore(): number {
             return this.score;
@@ -376,5 +409,7 @@
             return 1;
         }
         update() {
+            // this.updateBallStationaryStatus();
+
         } 
     }

@@ -49,10 +49,8 @@ export class ScoreboardScene extends Phaser.Scene {
     setupScoreboard(): void {
         console.log("Current Level Number:", this.levelNumber);
         this.scoreboardView.createScoreboard(this.scoreValue, this.launchCount);
-
         let result = this.controller.getResult(this.levelNumber);
         console.log("Result fetched for level:", this.levelNumber, "Result:", result);
-
         if (!result) {
             console.log("Creating new result for level:", this.levelNumber);
             result = new PlayerLevelResultDTO(
@@ -65,7 +63,6 @@ export class ScoreboardScene extends Phaser.Scene {
                 this.levelNumber
             );
         } else {
-
             result.updateHighestScore(this.scoreValue);
             result.updateHighestStar(this.highestStar);
         }
@@ -73,24 +70,30 @@ export class ScoreboardScene extends Phaser.Scene {
         console.log("Updated score for level", this.levelNumber, "New highest score:", result.highestScore, "New highest stars:", result.highestStar);
         this.controller.addResult(this.levelNumber, result);
     }
-
     registerEvents(): void {
         this.events.on("restartGame", this.restartGame.bind(this));
         this.events.on("resumeGame", this.resumeGame.bind(this));
     }
-
     restartGame(): void {
     this.scene.stop("scoreboard");
     console.log("Game restarting...");
     }
-
     resumeGame(): void {
         const nextLevelNumber = this.levelNumber + 1;
+        const currentHighestLevel = parseInt(localStorage.getItem('highestLevelUnlocked') || '1', 10);
+    
+        if (nextLevelNumber > currentHighestLevel) {
+            localStorage.setItem('highestLevelUnlocked', nextLevelNumber.toString());
+        }
+    
         console.log(`Resuming to level ${nextLevelNumber}...`);
-
         const initialScore = this.controller.getResult(this.levelNumber)?.highestScore || 0; 
         const initialStars = this.controller.getResult(this.levelNumber)?.highestStar || 0;
         const launchCount = this.launchCount + 1;
+    
+        // Chuyển sang màn Levels với dữ liệu cập nhật
         this.scene.start("Levels", { levelNumber: nextLevelNumber, score: initialScore, launchCount: launchCount, stars: initialStars });
+        this.scene.stop("scoreboard");
     }
+    
 }

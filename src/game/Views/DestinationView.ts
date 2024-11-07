@@ -1,4 +1,3 @@
-import Phaser from 'phaser';
 
 interface DestinationData {
     id: number;
@@ -11,14 +10,14 @@ export default class DestinationView {
     private scene: Phaser.Scene;
     public destinationData: DestinationData;
     private phaserObject: Phaser.GameObjects.Graphics;
-    public matterBody: MatterJS.Body; // Chỉ định kiểu Body thay vì BodyType | null
+    public matterBody: MatterJS.Body; 
 
     constructor(scene: Phaser.Scene, destinationData: DestinationData) {
         this.scene = scene;
         this.destinationData = destinationData;
         
         this.phaserObject = this.createPhaserObject();
-        this.matterBody = this.createMatterBody() as MatterJS.Body; // Chuyển đổi kiểu
+        this.matterBody = this.createMatterBody() as MatterJS.Body; 
     }
 
     private createPhaserObject(): Phaser.GameObjects.Graphics {
@@ -51,7 +50,6 @@ export default class DestinationView {
         if (newData.positionY !== undefined) this.destinationData.positionY = newData.positionY;
         if (newData.radius !== undefined) this.destinationData.radius = newData.radius;
 
-        // Update Phaser object and Matter body to reflect new data
         this.update();
         // this.matterBody.position.x = this.destinationData.positionX;
         // this.matterBody.position.y = this.destinationData.positionY;

@@ -19,6 +19,8 @@ export class UIScene extends Phaser.Scene {
   private launchCount: number = 0;
   private launchText!: Phaser.GameObjects.Text;
   private textContainer!: Phaser.GameObjects.Container;
+  private levelNumber: number;
+
 
   constructor() {
     super("uiScene");
@@ -29,6 +31,10 @@ export class UIScene extends Phaser.Scene {
     this.load.image("but_restart_small", "assets/images/but_restart_small.png");
     this.load.image("but_centre_view", "assets/images/but_centre_view.png");
   }
+  init(data: { levelNumber?: number }) {
+    this.levelNumber = data.levelNumber || 1;
+    console.log("ui",this.levelNumber)
+}
 
   async create() {
     const settingId = 3;
@@ -57,7 +63,12 @@ export class UIScene extends Phaser.Scene {
           yoyo: true,
           onComplete: () => {
             isTweening = false;
-            this.scene.launch("choice");
+        // Khởi chạy `Choice` ở chế độ overlay mà không dừng các cảnh khác
+        this.scene.launch("Choice",{levelNumber: this.levelNumber});
+
+        // Đảm bảo rằng cảnh `Choice` được đặt ở chế độ overlay
+        this.scene.bringToTop("Choice");  // Đưa Choice lên trên cùng nếu cần
+
           }
         });
       }

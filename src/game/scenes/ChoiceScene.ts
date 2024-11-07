@@ -2,9 +2,12 @@ import Phaser from 'phaser';
 
 class ChoiceScene extends Phaser.Scene {
     private isTweening: boolean;
+    private levelNumber: number;
+
     constructor() {
-        super("choice");
+        super("Choice");
         this.isTweening = false;
+        this.levelNumber = 1; // Default value
     }
 
     preload() {
@@ -13,24 +16,33 @@ class ChoiceScene extends Phaser.Scene {
         this.load.image("but_yes", "assets/images/but_yes.png");
     }
 
+    init(data: { levelNumber?: number }) {
+        this.levelNumber = data.levelNumber || 1;
+        console.log("choice", this.levelNumber);
+    }
+
     create() {
         const centerX = this.cameras.main.width / 2;
         const centerY = this.cameras.main.height / 2;
 
+        // Dark overlay for the modal effect
         const darkOverlay = this.add.graphics();
         darkOverlay.fillStyle(0x000000, 0.6);
         darkOverlay.fillRect(0, 0, this.scale.width, this.scale.height);
 
+        // Message box setup
         const scoreBoard = this.add.image(centerX, centerY, "msg_box")
             .setInteractive()
             .setOrigin(0.5, 0.5)
             .setDisplaySize(420, 320);
 
+        // Exit button setup
         const exitButton = this.add.image(280, 320, "but_exit")
             .setInteractive()
             .setOrigin(0.5, 0.5)
             .setDisplaySize(70, 70);
 
+        // Animating exit button
         this.tweens.add({
             targets: exitButton,
             scaleX: 0.6,
@@ -42,9 +54,10 @@ class ChoiceScene extends Phaser.Scene {
         });
 
         exitButton.on('pointerdown', () => {
-            this.scene.stop('choice');
+            this.scene.stop('Choice');
         });
 
+        // Yes button setup
         const yesButton = this.add.image(375, 320, "but_yes")
             .setInteractive()
             .setOrigin(0.5, 0.5)
@@ -65,16 +78,18 @@ class ChoiceScene extends Phaser.Scene {
                         this.isTweening = false;
                         this.cameras.main.fadeOut(250);
                         this.cameras.main.once('camerafadeoutcomplete', () => {
-                            this.scene.stop('uiScene');
-                            this.scene.stop('level1');
-                            this.scene.stop('choice');
-                            this.scene.start("playGame");
+                            const levelNumber = this.levelNumber;
+                            this.scene.stop("Levels", { levelNumber})
+                            this.scene.start("playGame",{levelNumber}); 
+                            this.scene.stop('uiScene'); 
+                            this.scene.stop('Choice',{levelNumber}); 
                         });
                     }
                 });
             }
         });
 
+        // Text prompts
         const completeText1 = this.add.text(180, 150, "ARE YOU SURE YOU WANT", { font: "22px Arial", color: "yellow" });
         const scoreText = this.add.text(215, 200, "TO QUIT THE GAME?", { font: "22px Arial", color: "yellow" });
     }
