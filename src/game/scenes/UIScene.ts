@@ -89,8 +89,13 @@ export class UIScene extends Phaser.Scene {
           duration: 150,
           yoyo: true,
           onComplete: () => {
+            this.cameras.main.fadeOut(250);
+            this.cameras.main.once('camerafadeoutcomplete', () => {
             isTweening = false;
-            this.scene.start("startGame");
+            this.scene.start("Levels"); 
+            this.scene.start("uiScene");
+          });
+
           }
         });
       }

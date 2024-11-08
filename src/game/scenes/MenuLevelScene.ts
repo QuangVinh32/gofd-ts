@@ -169,16 +169,21 @@ export default class MenuLevelScene extends Phaser.Scene {
     }
 
     startGame(level: number): void {
-        // this.cameras.main.once('camerafadeoutcomplete', () => {
-            // this.cameras.main.fadeOut(250);
+        // Bắt đầu hiệu ứng fade out
+        this.cameras.main.fadeOut(250); // Thời gian fade-out là 250ms
+    
+        // Chờ sự kiện fade-out hoàn tất
+        this.cameras.main.once('camerafadeoutcomplete', () => {
             this.isTweening = false;
             console.log("startGame -> MenuLevelScene");
-            this.scene.stop("LevelMenu",{ levelNumber: level }); 
+            
+            // Dừng cảnh hiện tại và chuyển sang cảnh mới
+            this.scene.stop("LevelMenu");
             this.scene.start("Levels", { levelNumber: level });
             this.scene.launch("uiScene", { levelNumber: level });
-        //   });
-
+        });
     }
+    
     
 
     getHighestLevelUnlocked(): number {
