@@ -78,22 +78,23 @@ export class ScoreboardScene extends Phaser.Scene {
     this.scene.stop("scoreboard");
     console.log("Game restarting...");
     }
-    resumeGame(): void {
-        const nextLevelNumber = this.levelNumber + 1;
-        const currentHighestLevel = parseInt(localStorage.getItem('highestLevelUnlocked') || '1', 10);
-    
-        if (nextLevelNumber > currentHighestLevel) {
-            localStorage.setItem('highestLevelUnlocked', nextLevelNumber.toString());
-        }
-    
-        console.log(`Resuming to level ${nextLevelNumber}...`);
-        const initialScore = this.controller.getResult(this.levelNumber)?.highestScore || 0; 
-        const initialStars = this.controller.getResult(this.levelNumber)?.highestStar || 0;
-        const launchCount = this.launchCount + 1;
-    
-        // Chuyển sang màn Levels với dữ liệu cập nhật
-        this.scene.start("Levels", { levelNumber: nextLevelNumber, score: initialScore, launchCount: launchCount, stars: initialStars });
-        this.scene.stop("scoreboard");
+resumeGame(): void {
+    const nextLevelNumber = this.levelNumber + 1;
+    const currentHighestLevel = parseInt(localStorage.getItem('highestLevelUnlocked') || '1', 10);
+
+    // Cập nhật highestLevelUnlocked nếu người chơi hoàn thành cấp độ cao nhất hiện tại
+    if (nextLevelNumber > currentHighestLevel) {
+        localStorage.setItem('highestLevelUnlocked', nextLevelNumber.toString());
     }
-    
+
+    console.log(`Resuming to level ${nextLevelNumber}...`);
+    const initialScore = this.controller.getResult(this.levelNumber)?.highestScore || 0; 
+    const initialStars = this.controller.getResult(this.levelNumber)?.highestStar || 0;
+    const launchCount = this.launchCount + 1;
+
+    // Chuyển sang màn Levels với dữ liệu cập nhật
+    this.scene.start("Levels", { levelNumber: nextLevelNumber, score: initialScore, launchCount: launchCount, stars: initialStars });
+    this.scene.stop("scoreboard");
+}
+
 }

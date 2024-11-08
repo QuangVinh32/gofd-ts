@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-
 class ChoiceScene extends Phaser.Scene {
     private isTweening: boolean;
     private levelNumber: number;
@@ -7,7 +6,7 @@ class ChoiceScene extends Phaser.Scene {
     constructor() {
         super("Choice");
         this.isTweening = false;
-        this.levelNumber = 1; // Default value
+        this.levelNumber = 1;
     }
 
     preload() {
@@ -42,7 +41,6 @@ class ChoiceScene extends Phaser.Scene {
             .setOrigin(0.5, 0.5)
             .setDisplaySize(70, 70);
 
-        // Animating exit button
         this.tweens.add({
             targets: exitButton,
             scaleX: 0.6,
@@ -57,7 +55,6 @@ class ChoiceScene extends Phaser.Scene {
             this.scene.stop('Choice');
         });
 
-        // Yes button setup
         const yesButton = this.add.image(375, 320, "but_yes")
             .setInteractive()
             .setOrigin(0.5, 0.5)
@@ -89,7 +86,6 @@ class ChoiceScene extends Phaser.Scene {
             }
         });
 
-        // Text prompts
         const completeText1 = this.add.text(180, 150, "ARE YOU SURE YOU WANT", { font: "22px Arial", color: "yellow" });
         const scoreText = this.add.text(215, 200, "TO QUIT THE GAME?", { font: "22px Arial", color: "yellow" });
     }

@@ -28,6 +28,9 @@ class MainScene extends Scene {
             this.levelNumber = data.levelNumber || 1;
             console.log("play", this.levelNumber);
         }
+        
+        
+        
 
   async create(): Promise<void> {
       this.bgMenu = this.add.image(0, 0, 'bg_menu').setOrigin(0, 0).setDisplaySize(this.game.config.width as number, this.game.config.height as number);
@@ -77,7 +80,7 @@ class MainScene extends Scene {
       });
   }
 
-  handleButtonClick(button: GameObjects.Image, sceneKey: string): void {
+  handleButtonClick(button: GameObjects.Image, sceneKey: string,data: object = {}): void {
       this.tweens.add({
           targets: button,
           y: button.y + 15,
@@ -87,9 +90,9 @@ class MainScene extends Scene {
           onComplete: () => {
               this.cameras.main.fadeOut(250);
               this.cameras.main.once('camerafadeoutcomplete', () => {
-              this.scene.start(sceneKey);
-              this.scene.stop("playGame")
-              console.log("1")
+              this.scene.start(sceneKey,{levelNumber: this.levelNumber});
+
+              
               });
           }
       });

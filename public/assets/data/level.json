@@ -26,6 +26,15 @@
       "rows": 3,
       "origin": { "x": 0, "y": 0 }
     }
+    ,  {
+      "levelId": 4,
+      "levelNumber": 4,
+      "width": 1800,
+      "height": 900,
+      "columns": 6,
+      "rows": 3,
+      "origin": { "x": 0, "y": 0 }
+    }
       
   ]
   

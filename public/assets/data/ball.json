@@ -59,8 +59,8 @@
             "levelNumber": 4,
             "positionX": 500,
             "positionY": 200,
-            "width": 50,
-            "height": 50,
+            "width": 10,
+            "height": 10,
             "origin": {
                 "x": 0.5,
                 "y": 0.5

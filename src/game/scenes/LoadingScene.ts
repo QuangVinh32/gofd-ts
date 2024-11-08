@@ -33,6 +33,7 @@ class LoadingScene extends Phaser.Scene {
 
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start("playGame");
+
     });
 
     this.cameras.main.fadeOut(1000);
