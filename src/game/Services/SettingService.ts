@@ -59,7 +59,7 @@ class SettingService {
         const settingView = this.settingViews.find(view => view.settingData.id === dto.id);
         if (settingView) {
             settingView.updateAudio();
-            settingView.updatePosition();
+            // settingView.updatePosition();
         }
     }
 

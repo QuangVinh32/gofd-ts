@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import Phaser from 'phaser'
 import  ObstacleDTO  from '../DTOs/ObstacleDTO';
 import ObstacleView from '../Views/ObstacleView';
 

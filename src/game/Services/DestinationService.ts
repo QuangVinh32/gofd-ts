@@ -30,7 +30,9 @@ class DestinationService {
                     destinationData.radius,
                     destinationData.origin,
                     destinationData.shape,
-                    destinationData.levelNumber
+                    destinationData.levelNumber,                  
+                    destinationData.alpha
+
                 );
                 this.controller.addDestination(dto);
             });
@@ -70,6 +72,8 @@ class DestinationService {
             currentDestination.radius = newData.radius ?? currentDestination.radius;
             currentDestination.shape = newData.shape ?? currentDestination.shape;
             currentDestination.origin = newData.origin ?? currentDestination.origin;
+            currentDestination.alpha = newData.alpha ?? currentDestination.alpha;
+
             currentDestination.levelNumber = newData.levelNumber ?? currentDestination.levelNumber;
 
             this.controller.updateDestination(id, currentDestination);

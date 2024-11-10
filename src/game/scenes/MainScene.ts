@@ -19,6 +19,7 @@ class MainScene extends Scene {
       this.load.image("menu_text_minigolf", "assets/images/menu_text_minigolf.png");
       this.load.image("but_continue", "assets/images/but_continue.png");
       this.load.image("but_play", "assets/images/but_play.png");
+      this.load.audio("soundtrack","assets/audio/soundtrack.mp3")
       this.load.spritesheet("audio", "assets/images/audio_icon_spritesheet.png", {
           frameWidth: 128,
           frameHeight: 128,
@@ -90,9 +91,7 @@ class MainScene extends Scene {
           onComplete: () => {
               this.cameras.main.fadeOut(250);
               this.cameras.main.once('camerafadeoutcomplete', () => {
-              this.scene.start(sceneKey,{levelNumber: this.levelNumber});
-
-              
+              this.scene.start(sceneKey,{levelNumber: this.levelNumber});           
               });
           }
       });

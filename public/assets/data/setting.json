@@ -4,13 +4,13 @@
             "id": 1,
             "positionX": 610,
             "positionY": 40,
-            "isSoundOn": true,
-            "currentFrame": 1
+            "isSoundOn": false,
+            "currentFrame": 0
         },
         {
             "id": 2,
-            "positionX": 100,
-            "positionY": 100,
+            "positionX": 560,
+            "positionY": 40,
             "isSoundOn": false,
             "currentFrame": 0
         },

@@ -7,6 +7,7 @@
             "radius": 6,
             "origin": {"x": 0, "y": 0},
             "shape": "circle",
+            "alpha": 0,
             "levelNumber": 1
         },
         {
@@ -16,6 +17,8 @@
             "radius": 6,
             "origin": {"x": 0, "y": 0},
             "shape": "circle",
+            "alpha": 3,
+
             "levelNumber": 2
         },  {
             "id": 3,
@@ -24,6 +27,8 @@
             "radius": 6,
             "origin": {"x": 0, "y": 0},
             "shape": "circle",
+            "alpha": 3,
+
             "levelNumber": 3
         }
     ]

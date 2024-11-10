@@ -79,7 +79,6 @@ async create() {
     const ballDTO = this.ballService.getBallDTOById(this.levelNumber);
     if (ballDTO) {
         this.ballView = this.ballService.getBallViewById(this.levelNumber);
-        console.log("ballDTO",ballDTO)
         if (this.ballView && this.ballView.phaserObject) {
             this.ballView.launch = 0; 
             this.score = 1200;
@@ -132,9 +131,13 @@ async create() {
 
     this.destinationService = new DestinationService(this, 'assets/data/destination.json');
     await this.destinationService.initialize(this.levelNumber);
-    const DestinationDTO = this.destinationService.getDestinationDTOById(this.levelNumber);
-    if (DestinationDTO) {
+    const destinationDTO = this.destinationService.getDestinationDTOById(this.levelNumber);
+    console.log("des",destinationDTO)
+    if (destinationDTO) {
         this.destinationView = this.destinationService.getDestinationViewById(this.levelNumber);
+            // destinationDTO.alpha = 0;  // Modify alpha property if needed
+
+
     }
     
     this.obstacleService = new ObstacleService(this, "assets/data/obstacle.json");
@@ -146,12 +149,6 @@ async create() {
     this.matter.world.on('collisionstart', (event: MatterJS.IEventCollision<any>) => {
         event.pairs.forEach((pair: any) => {
             const { bodyA, bodyB } = pair;
-            console.log("body=a",bodyA);
-            console.log("body=b",bodyB);
-            console.log("1",this.ballView.matterBody);
-            console.log("2",this.destinationView.matterBody);
-            // console.log("1ob",this.ballView.phaserObject.x);
-            // console.log("2ob",this.destinationView.phaserObject);
             if (this.ballView && this.destinationView &&
                 ((bodyA === this.ballView.matterBody && bodyB === this.destinationView.matterBody) ||
                 (bodyA === this.destinationView.matterBody && bodyB === this.ballView.matterBody    ))) 
@@ -199,8 +196,8 @@ getFlagPositions(level: number): { x: number; y: number }[] {
     } = {
         1: [{ x: 1160, y: 322 }, { x: 1073, y: 275 }],
         2: [{ x: 1262, y: 410 }, { x: 1163, y: 455 }],
-        3: [{ x: 500, y: 400 }, { x: 450, y: 350 }],
-        default: [{ x: 100, y: 100 }, { x: 150, y: 150 }]
+        3: [{ x: 1510, y: 210 }, { x: 1220, y: 50  }],
+        default: [{ x: 100, y: 100 }, { x: 150, y: 79 }]
     };
     return flagPositions[level] || flagPositions.default;
 }
@@ -228,51 +225,59 @@ onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image)
     
     const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
 
-    this.arrow = this.add.image(gameObject.x, gameObject.y, 'arrow').setOrigin(0.5, 0.5).setDisplaySize(50,8);
+    this.arrow = this.add.image(gameObject.x, gameObject.y, 'arrow')
+        .setOrigin(0.5, 0.5)
+        .setDisplaySize(50, 8);
 
     this.arrowFill = this.add.image(gameObject.x, gameObject.y, 'arrow_fill')
         .setOrigin(0.5, 0.5)
-        .setDisplaySize(50, 8)
+        .setDisplaySize(50, 8); // Kích thước ban đầu giống `arrow`
 
     this.line = this.add.line(0, 0, gameObject.x, gameObject.y, worldPoint.x, worldPoint.y, 0xFF0000);
     this.line.setLineWidth(2);
 
     this.cameras.main.stopFollow();
 }
+
 onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) {
     const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
 
-    // if (this.pressIndicator) {
-    //     this.pressIndicator.setPosition(gameObject.x, gameObject.y);
-    // }
-    
+    // Cập nhật vị trí của `line`
     if (this.line) {
         const dx = worldPoint.x - gameObject.x;
         const dy = worldPoint.y - gameObject.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-            
-        const offsetDistance = 7; 
+        const offsetDistance = 7;
 
         const startX = gameObject.x + (dx / distance) * offsetDistance;
         const startY = gameObject.y + (dy / distance) * offsetDistance;
-
         this.line.setTo(startX, startY, worldPoint.x, worldPoint.y);
     }
+
+    // Cập nhật vị trí và hướng của `arrow` và `arrowFill`
     if (this.arrow && this.arrowFill) {
-    const dx = worldPoint.x - gameObject.x;
-    const dy = worldPoint.y - gameObject.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+        const dx = worldPoint.x - gameObject.x;
+        const dy = worldPoint.y - gameObject.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);  // Ensure distance is recalculated here
 
-    const arrowLength = 25;
-    const arrowX = gameObject.x - (dx / distance) * arrowLength;
-    const arrowY = gameObject.y - (dy / distance) * arrowLength;
-    const angle = Phaser.Math.Angle.Between(gameObject.x, gameObject.y, worldPoint.x, worldPoint.y);
+        const fixedArrowDistance = 25;
+        const angle = Phaser.Math.Angle.Between(gameObject.x, gameObject.y, worldPoint.x, worldPoint.y);
 
-    this.arrow.setPosition(arrowX, arrowY).setRotation(angle + Math.PI);
+        const arrowX = gameObject.x - Math.cos(angle) * fixedArrowDistance;
+        const arrowY = gameObject.y - Math.sin(angle) * fixedArrowDistance;
 
-    this.arrowFill.setPosition(arrowX, arrowY).setRotation(angle + Math.PI);
+        this.arrow.setPosition(arrowX, arrowY).setRotation(angle + Math.PI);
+        this.arrowFill.setPosition(arrowX, arrowY).setRotation(angle + Math.PI);
+
+        // Tính lực (dựa vào khoảng cách) và điều chỉnh tỷ lệ hiển thị của `arrowFill`
+        const maxDistance = 200; // Khoảng cách tối đa để đạt 100% `arrowFill`
+        const percentage = Phaser.Math.Clamp(distance / maxDistance, 0, 1); // Tỷ lệ lực trong khoảng 0 đến 1
+
+        // Điều chỉnh kích thước `arrowFill` theo tỷ lệ `percentage`
+        this.arrowFill.setDisplaySize(50 * percentage, 8);
+    }
 }
-}
+
 onDragEnd(pointer: Phaser.Input.Pointer, gameObject:LaunchableSprite) {
     this.isDraggingBall = false;
 
@@ -402,7 +407,7 @@ checkBallMotion() {
             if (this.pressIndicator) {
                 this.pressIndicator.setVisible(true);
                 this.pressIndicator.setPosition(this.ballView.phaserObject.x, this.ballView.phaserObject.y); // Đặt vị trí của chỉ báo
-                console.log("speed")
+                // console.log("speed")
             }
         } else {
             // Nếu bóng đang di chuyển, ẩn chỉ báo nhấn

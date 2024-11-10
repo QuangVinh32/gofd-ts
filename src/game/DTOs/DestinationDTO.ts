@@ -2,21 +2,30 @@ export default class DestinationDTO {
     private _id: number;
     private _positionX: number;
     private _positionY: number;
+    private _alpha: number;
     private _radius: number;
     private _origin: { x: number, y: number };
     private _shape: string;
     private _levelNumber : number;
 
-	constructor(id: number, positionX: number, positionY: number ,radius: number, origin: number, shape: string, levelNumber: number) {
+	constructor(id: number, positionX: number, positionY: number ,radius: number, origin: number, shape: string, levelNumber: number,alpha: number) {
 		this._id = id;
 		this._positionX = positionX;
         this._positionY = positionY;
 		this._radius = radius;
         this._origin = { x: 0, y: 0 }; 
 		this._shape = shape;
+        this._alpha = alpha;
 		this._levelNumber = levelNumber;
 
 	}
+    public get alpha(): number {
+        return this._alpha;
+    }
+
+    public set alpha(alpha: number) {
+        this._alpha = alpha;
+    }
 
     /**
      * Getter positionY

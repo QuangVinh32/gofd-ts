@@ -1,7 +1,10 @@
 import Phaser from 'phaser';
 import PlayerLevelResultService from '../Services/PlayerLevelResultService';
+import SettingService from "../Services/SettingService"
+
 export default class MenuLevelScene extends Phaser.Scene {
     private levelResultService: PlayerLevelResultService;
+    private settingService!: SettingService; 
     private isTweening: boolean = false;
     private levelNumber: number = 1;
 
@@ -35,8 +38,7 @@ export default class MenuLevelScene extends Phaser.Scene {
         console.log("menulevel", this.levelNumber);
     }
 
-    create(): void {
-
+    async create(): Promise<void> {
         this.add.image(0, 0,'bg_menu')
             .setOrigin(0, 0)
             .setDisplaySize(this.game.config.width as number, this.game.config.height as number);
@@ -45,6 +47,10 @@ export default class MenuLevelScene extends Phaser.Scene {
         darkOverlay.fillStyle(0x000000, 0.6);
         darkOverlay.fillRect(0, 0, this.game.config.width as number, this.game.config.height as number);
         this.add.text(210, 40, "SELECT A LEVEL", { font: "30px Arial", color: "Yellow" });
+
+        const settingId = 2;
+        this.settingService = new SettingService(this, "assets/data/setting.json");
+        await this.settingService.initialize(settingId);
 
         let exitButton = this.add.image(620, 40, 'but_exit')
             .setInteractive()
@@ -68,6 +74,7 @@ export default class MenuLevelScene extends Phaser.Scene {
                 });
             }
             });
+
 
         
 
@@ -169,15 +176,9 @@ export default class MenuLevelScene extends Phaser.Scene {
     }
 
     startGame(level: number): void {
-        // Bắt đầu hiệu ứng fade out
-        this.cameras.main.fadeOut(250); // Thời gian fade-out là 250ms
-    
-        // Chờ sự kiện fade-out hoàn tất
+        this.cameras.main.fadeOut(250); 
         this.cameras.main.once('camerafadeoutcomplete', () => {
-            this.isTweening = false;
-            console.log("startGame -> MenuLevelScene");
-            
-            // Dừng cảnh hiện tại và chuyển sang cảnh mới
+            this.isTweening = false;            
             this.scene.stop("LevelMenu");
             this.scene.start("Levels", { levelNumber: level });
             this.scene.launch("uiScene", { levelNumber: level });
@@ -191,5 +192,7 @@ export default class MenuLevelScene extends Phaser.Scene {
         let levelUnlocked = highestLevel ? parseInt(highestLevel, 10) : 1;
         return levelUnlocked;
     }
+
+    
 
 }
