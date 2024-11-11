@@ -16,7 +16,7 @@ export default class PlayerLevelResultController {
         return this.service.getResult(levelNumber);
     }
 
-    // getAllResults(): PlayerLevelResultDTO[] {
-    //     return this.service.getAllResults();
-    // }
+    getAllResults(): PlayerLevelResultDTO[] {
+        return this.service.getAllResults();
+    }
 }

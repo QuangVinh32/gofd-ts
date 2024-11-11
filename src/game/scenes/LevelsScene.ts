@@ -88,7 +88,7 @@ async create() {
             this.score = 1200;
             this.followBall(this.ballView.phaserObject);
             this.ballView.phaserObject.setFixedRotation();
-            console.log("ballView ",this.ballView, "ballViewBody",this.ballView.phaserObject.body);
+            // console.log("ballView ",this.ballView, "ballViewBody",this.ballView.phaserObject.body);
             this.isTweening = false;
 
             const ballWidth = this.ballView.phaserObject.width;
@@ -206,11 +206,6 @@ getFlagPositions(level: number): { x: number; y: number }[] {
     return flagPositions[level] || flagPositions.default;
 }
 
-
-
-
-
-
 setupBallInteraction(phaserBall: Phaser.GameObjects.Image) {
     phaserBall.setInteractive();
     this.input.setDraggable(phaserBall);
@@ -239,19 +234,13 @@ onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image)
         .setOrigin(0.5, 0.5)
         .setDisplaySize(50, 8);
 
-
     this.arrowFill = this.add.image(gameObject.x, gameObject.y, 'arrow_fill')
         .setOrigin(0.5, 0.5)
         .setDisplaySize(50, 8);
-
-
     // this.line = this.add.line(0, 0, gameObject.x, gameObject.y, worldPoint.x, worldPoint.y, 0x000000);
     // this.line.setLineWidth(2);
-
-
     this.cameras.main.stopFollow();
 }
-
 onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) {
     const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
 
@@ -260,32 +249,27 @@ onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) {
     const distance = Math.sqrt(dx * dx + dy * dy);
     const offsetDistance = 10;
 
-    const stepSize = 5;  // Kích thước đoạn nét đứt
+    const stepSize = 5;  
     const stepAmount = Math.ceil(distance / stepSize)
 
     let startX = gameObject.x + (dx / distance) * offsetDistance;
     let startY = gameObject.y + (dy / distance) * offsetDistance;
-    // Xóa các đoạn nét đứt cũ (nếu có)
     if (this.dashedLines) {
         this.dashedLines.forEach(line => line.destroy());
     } 
-    this.dashedLines = [];  // Mảng chứa các đoạn nét đứt
-    // Vẽ các đoạn nét đứt
+    this.dashedLines = [];  
     for (let i = 0; i < stepAmount; i++) {
         const targetX = startX + (dx / distance) * stepSize;
         const targetY = startY + (dy / distance) * stepSize;
-        // Tạo hiệu ứng nét đứt (vẽ chỉ một số đoạn nhất định)
         if (i % 2 === 0) {
             const line = this.add.line(0, 0, startX, startY, targetX, targetY, 0x000000);
             line.setLineWidth(2);
-            this.dashedLines.push(line);  // Lưu đoạn nét đứt vào mảng
+            this.dashedLines.push(line);
         }
-        // Cập nhật điểm bắt đầu cho đoạn tiếp theo
         startX = targetX;
         startY = targetY;
     } 
 
-    // Cập nhật vị trí và hướng của `arrow` và `arrowFill`
     if (this.arrow && this.arrowFill) {
         const dx = worldPoint.x - gameObject.x;
         const dy = worldPoint.y - gameObject.y;
@@ -305,8 +289,7 @@ onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) {
 
         const cropWidth = 200 * percentage; 
         this.arrowFill.setCrop(0, 0, cropWidth, 33); 
-        
-        
+          
     }
 }
 
@@ -347,8 +330,8 @@ onDragEnd(pointer: Phaser.Input.Pointer, gameObject:LaunchableSprite) {
         uiScene.updateLaunchCount(gameObject.launch);
     }
     if (this.dashedLines) {
-        this.dashedLines.forEach(line => line.destroy());  // Xóa tất cả các nét đứt
-        this.dashedLines = [];  // Làm mới mảng dashedLines
+        this.dashedLines.forEach(line => line.destroy());  
+        this.dashedLines = [];  
     }
 
     if (this.line) {

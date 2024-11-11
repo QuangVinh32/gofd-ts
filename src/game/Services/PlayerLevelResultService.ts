@@ -64,4 +64,8 @@ export default class PlayerLevelResultService {
         });
         localStorage.setItem('levelResults', JSON.stringify(resultsObj)); 
     }
+    
+    getAllResults(): PlayerLevelResultDTO[] {
+        return Array.from(this.results.values());
+    }
 }

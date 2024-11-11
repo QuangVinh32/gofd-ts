@@ -75,14 +75,18 @@ export default class MenuLevelScene extends Phaser.Scene {
             }
             });
 
+        const levelResults = JSON.parse(localStorage.getItem("levelResults") || "{}");
         // Tính tổng điểm
         let totalScore = 0;
         let highestLevelUnlocked = this.getHighestLevelUnlocked();
         console.log("Highest level unlocked:", highestLevelUnlocked);
 
+        let results = this.levelResultService.getAllResults();
+        console.log("lấy tất cả kết quả", results)
+
         for (let i = 1; i <= highestLevelUnlocked; i++) {
-            let levelResult = this.levelResultService.getResult(i);
-            let score = levelResult ? levelResult.highestScore : 0;
+        const levelData = levelResults[i] || [];
+        const score = levelData[2] || 0;  // Giả định điểm cao nhất là phần tử thứ 3 (index 2)
             totalScore += score;
         }
         // Hiển thị tổng điểm
@@ -106,14 +110,11 @@ export default class MenuLevelScene extends Phaser.Scene {
             singleButtonGroup.add(butLevel);
             singleButtonGroup.add(numberOfLevels);
         
+        
             if (isUnlocked) {
-                let levelResult = this.levelResultService.getResult(i);
-                let score = levelResult ? levelResult.highestScore : 0;
-                console.log("điểm",score);
-                let stars = levelResult ? levelResult.highestStar : 0;
-                console.log("sao",stars);
-
-                
+                const levelData = levelResults[i] || [];
+                const score = levelData[2] || 0;
+                const stars = levelData[3] || 0;
 
                 for (let j = 1; j <= 3; j++) {
                     let starFrame = j <= stars ? 0 : 1;
@@ -189,7 +190,9 @@ export default class MenuLevelScene extends Phaser.Scene {
 
     getHighestLevelUnlocked(): number {
         const highestLevel = localStorage.getItem('highestLevelUnlocked');
-        let levelUnlocked = highestLevel ? parseInt(highestLevel, 10) : 1;
+        let levelUnlocked = highestLevel ? parseInt(highestLevel, 10) : 1;   
         return levelUnlocked;
     }
+
+   
 }
