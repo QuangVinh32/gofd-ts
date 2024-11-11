@@ -81,8 +81,8 @@ export class ScoreboardScene extends Phaser.Scene {
         this.cameras.main.once('camerafadeoutcomplete', () => {
             // this.scene.stop("scoreboard");  // Dừng cảnh scoreboard hiện tại
             // this.scene.stop("uiScene");     // Dừng cảnh uiScene hiện tại
-            // this.scene.start("Levels");     // Khởi động lại màn Levels
-            // this.scene.start("uiScene");    // Khởi động lại uiScene
+            this.scene.start("Levels");     // Khởi động lại màn Levels
+            this.scene.start("uiScene");    // Khởi động lại uiScene
             // console.log("Game restarting...");
         });
     }
@@ -101,7 +101,7 @@ export class ScoreboardScene extends Phaser.Scene {
         const initialStars = this.controller.getResult(this.levelNumber)?.highestStar || 0;
         const launchCount = this.launchCount + 1;
 
-        this.cameras.main.fadeOut(250, 0, 0, 0); // Thời gian 250ms với màu đen
+        this.cameras.main.fadeOut(250, 0, 0, 0);
         this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.start("Levels", { levelNumber: nextLevelNumber, score: initialScore, launchCount: launchCount, stars: initialStars });
             this.scene.stop("scoreboard");

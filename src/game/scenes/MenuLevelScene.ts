@@ -75,9 +75,6 @@ export default class MenuLevelScene extends Phaser.Scene {
             }
             });
 
-
-        
-
         // Tính tổng điểm
         let totalScore = 0;
         let highestLevelUnlocked = this.getHighestLevelUnlocked();
@@ -112,7 +109,11 @@ export default class MenuLevelScene extends Phaser.Scene {
             if (isUnlocked) {
                 let levelResult = this.levelResultService.getResult(i);
                 let score = levelResult ? levelResult.highestScore : 0;
+                console.log("điểm",score);
                 let stars = levelResult ? levelResult.highestStar : 0;
+                console.log("sao",stars);
+
+                
 
                 for (let j = 1; j <= 3; j++) {
                     let starFrame = j <= stars ? 0 : 1;
@@ -123,8 +124,8 @@ export default class MenuLevelScene extends Phaser.Scene {
                     singleButtonGroup.add(star);
                 }
 
-                let scoreText = this.add.text(0, 40, score.toString(), { font: "15px Arial Bold", color: "yellow" }).setOrigin(0.5, 0.5);
-                singleButtonGroup.add(scoreText);
+            let scoreText = this.add.text(0, 40, score.toString(), { font: "15px Arial Bold", color: "yellow" }).setOrigin(0.5, 0.5);
+            singleButtonGroup.add(scoreText);
             } else {
                 for (let j = 1; j <= 3; j++) {
                     let star = this.add.sprite((j - 2) * 17, -25, 'star')
@@ -172,7 +173,6 @@ export default class MenuLevelScene extends Phaser.Scene {
         }
 
         buttonGroup.x += 50;
-
     }
 
     startGame(level: number): void {
@@ -192,7 +192,4 @@ export default class MenuLevelScene extends Phaser.Scene {
         let levelUnlocked = highestLevel ? parseInt(highestLevel, 10) : 1;
         return levelUnlocked;
     }
-
-    
-
 }

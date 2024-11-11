@@ -77,7 +77,9 @@ export class UIScene extends Phaser.Scene {
     let restartSmallButton = this.add.image(560, 40, 'but_restart_small')
       .setInteractive()
       .setOrigin(0.5, 0.5)
-      .setDisplaySize(55, 55);
+      .setDisplaySize(55, 55)
+      // .setCrop(55, 0, 55, 55);
+      ;
     restartSmallButton.on('pointerdown', () => {
       if (!isTweening) {
         isTweening = true;
@@ -118,20 +120,12 @@ export class UIScene extends Phaser.Scene {
           yoyo: true,
           onComplete: () => {
             isTweening = false;
-
             const levelScene = this.scene.get('Levels') as LevelScene;
-            console.log("Level Scene:", levelScene);
-
             if (levelScene && levelScene.ballService) {
               const ballView = levelScene.ballService.getBallViewById(levelScene.levelNumber);
-              console.log("Ball view:", ballView);
-
               if (ballView) {
                 const camera = levelScene.cameras.main;
-                console.log("Camera:", camera);
-
                 console.log("Ball coordinates:", ballView.phaserObject.x, ballView.phaserObject.y);
-
                 camera.pan(ballView.phaserObject.x, ballView.phaserObject.y, 1000, 'Power2');
               } else {
                 console.warn("Ball not found!");

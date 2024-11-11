@@ -60,7 +60,7 @@ async create() {
     this.launchCount = 0;
     this.score = 1200; 
     this.levelService = new LevelService(this, 'assets/data/level.json');
-    await this.levelService.initialize(this.levelNumber); 
+    await this.levelService.initialize(this.levelNumber);
 
     const levelView = this.levelService.getLevelViewById(this.levelNumber); 
 
@@ -68,10 +68,11 @@ async create() {
 
         const canvasSize = levelView.calculateCanvasSize();
         this.cameras.main.setBounds(0, 0, canvasSize.width, canvasSize.height);
-
         levelView.createBackground();
 
+
     }
+
     this.ballService = new BallService(this, "assets/data/ball.json");
     this.ballHitSound = this.sound.add("hit_ball");
 
@@ -201,6 +202,12 @@ getFlagPositions(level: number): { x: number; y: number }[] {
     };
     return flagPositions[level] || flagPositions.default;
 }
+
+
+
+
+
+
 setupBallInteraction(phaserBall: Phaser.GameObjects.Image) {
     phaserBall.setInteractive();
     this.input.setDraggable(phaserBall);
@@ -229,12 +236,15 @@ onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image)
         .setOrigin(0.5, 0.5)
         .setDisplaySize(50, 8);
 
+
     this.arrowFill = this.add.image(gameObject.x, gameObject.y, 'arrow_fill')
         .setOrigin(0.5, 0.5)
-        .setDisplaySize(50, 8); // Kích thước ban đầu giống `arrow`
+        .setDisplaySize(50, 8);
 
-    this.line = this.add.line(0, 0, gameObject.x, gameObject.y, worldPoint.x, worldPoint.y, 0xFF0000);
+
+    this.line = this.add.line(0, 0, gameObject.x, gameObject.y, worldPoint.x, worldPoint.y, 0x000000);
     this.line.setLineWidth(2);
+
 
     this.cameras.main.stopFollow();
 }
@@ -258,7 +268,7 @@ onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) {
     if (this.arrow && this.arrowFill) {
         const dx = worldPoint.x - gameObject.x;
         const dy = worldPoint.y - gameObject.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);  // Ensure distance is recalculated here
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
         const fixedArrowDistance = 25;
         const angle = Phaser.Math.Angle.Between(gameObject.x, gameObject.y, worldPoint.x, worldPoint.y);
@@ -269,12 +279,13 @@ onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) {
         this.arrow.setPosition(arrowX, arrowY).setRotation(angle + Math.PI);
         this.arrowFill.setPosition(arrowX, arrowY).setRotation(angle + Math.PI);
 
-        // Tính lực (dựa vào khoảng cách) và điều chỉnh tỷ lệ hiển thị của `arrowFill`
-        const maxDistance = 200; // Khoảng cách tối đa để đạt 100% `arrowFill`
-        const percentage = Phaser.Math.Clamp(distance / maxDistance, 0, 1); // Tỷ lệ lực trong khoảng 0 đến 1
+        const maxDistance = 200;
+        const percentage = Phaser.Math.Clamp(distance / maxDistance, 0, 1);
 
-        // Điều chỉnh kích thước `arrowFill` theo tỷ lệ `percentage`
-        this.arrowFill.setDisplaySize(50 * percentage, 8);
+        const cropWidth = 200 * percentage; 
+        this.arrowFill.setCrop(0, 0, cropWidth, 33); 
+        
+        
     }
 }
 
@@ -329,11 +340,8 @@ onDragEnd(pointer: Phaser.Input.Pointer, gameObject:LaunchableSprite) {
     }
     this.ballHitSound?.play();
 
-    // // Ẩn pressIndicator khi quả bóng di chuyển
-    // if (this.pressIndicator) {
-    //     this.pressIndicator.setVisible(false);
-    // }
-} 
+}
+ 
 setupCameraInteractions() {
     this.input.on('pointerdown', (pointer: { x: number; y: number; }) => {
         if (!this.isDraggingBall) { 
@@ -350,6 +358,7 @@ setupCameraInteractions() {
         }
     });
 } 
+
 handleCameraMovement(pointer: { isDown?: any; x?: any; y?: any; }) {
     const dx = pointer.x - this.startX;
     const dy = pointer.y - this.startY;
@@ -418,8 +427,9 @@ checkBallMotion() {
     } else {
         console.log("Ball view hoặc body của bóng là null hoặc không xác định.");
     }
+    
 }
-        
+  
     update() {
         this.checkBallMotion();
 
