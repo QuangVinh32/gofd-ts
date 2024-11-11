@@ -30,6 +30,7 @@ export class UIScene extends Phaser.Scene {
     this.load.image("but_exit", "assets/images/but_exit.png");
     this.load.image("but_restart_small", "assets/images/but_restart_small.png");
     this.load.image("but_centre_view", "assets/images/but_centre_view.png");
+    this.load.audio("click","assets/audio/click.mp3")
   }
   init(data: { levelNumber?: number }) {
     this.levelNumber = data.levelNumber || 1;
@@ -52,6 +53,7 @@ export class UIScene extends Phaser.Scene {
       .setOrigin(0.5, 0.5)
       .setDisplaySize(55, 55);
     exitButton.on('pointerdown', () => {
+      this.sound.play("click");
       if (!isTweening) {
         isTweening = true;
         this.tweens.add({
@@ -81,6 +83,7 @@ export class UIScene extends Phaser.Scene {
       // .setCrop(55, 0, 55, 55);
       ;
     restartSmallButton.on('pointerdown', () => {
+      this.sound.play("click");
       if (!isTweening) {
         isTweening = true;
         this.tweens.add({
@@ -109,6 +112,7 @@ export class UIScene extends Phaser.Scene {
       .setDisplaySize(55, 55);
 
     centreViewButton.on('pointerdown', () => {
+      this.sound.play("click");
       if (!isTweening) {
         isTweening = true;
         this.tweens.add({

@@ -23,6 +23,7 @@ class MainScene extends Scene {
       this.load.image("but_continue", "assets/images/but_continue.png");
       this.load.image("but_play", "assets/images/but_play.png");
       this.load.audio("soundtrack","assets/audio/soundtrack.mp3")
+      this.load.audio("click","assets/audio/click.mp3")
       this.load.spritesheet("audio", "assets/images/audio_icon_spritesheet.png", {
           frameWidth: 128,
           frameHeight: 128,
@@ -85,6 +86,7 @@ class MainScene extends Scene {
   }
 
   handleButtonClick(button: Phaser.GameObjects.Image, sceneKey: string, data: ButtonClickData = { clearLocalStorage: false }): void {
+    this.sound.play("click");
     this.tweens.add({
         targets: button,
         y: button.y + 15,

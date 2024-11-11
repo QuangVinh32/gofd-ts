@@ -52,6 +52,7 @@ class ChoiceScene extends Phaser.Scene {
         });
 
         exitButton.on('pointerdown', () => {
+            this.sound.play("click");
             this.scene.stop('Choice');
         });
 
@@ -61,6 +62,7 @@ class ChoiceScene extends Phaser.Scene {
             .setDisplaySize(70, 70);
 
         yesButton.on('pointerdown', () => {
+            this.sound.play("click");
             if (!this.isTweening) {
                 this.isTweening = true;
                 this.tweens.add({

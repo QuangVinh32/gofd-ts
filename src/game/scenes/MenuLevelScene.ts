@@ -153,6 +153,7 @@ export default class MenuLevelScene extends Phaser.Scene {
 
     if (isUnlocked) {
         butLevel.on('pointerdown', () => {
+            this.sound.play("click");
             console.log(`Button for Level ${i} clicked.`);
             if (!this.isTweening) {
                 this.isTweening = true;
