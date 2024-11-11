@@ -1,5 +1,8 @@
 import { Scene, Game, GameObjects, Tweens } from 'phaser';
 import SettingService from "../Services/SettingService"
+interface ButtonClickData {
+    clearLocalStorage: boolean;
+}
 
 class MainScene extends Scene {
   private settingService!: SettingService; 
@@ -73,30 +76,32 @@ class MainScene extends Scene {
       await this.settingService.initialize(settingId);
 
       this.playButton.on('pointerdown', () => {
-          this.handleButtonClick(this.playButton, "LevelMenu");
-      });
-
-      this.continueButton.on('pointerdown', () => {
-          this.handleButtonClick(this.continueButton, "LevelMenu");
-      });
+        this.handleButtonClick(this.playButton, "LevelMenu", { clearLocalStorage: true });
+    });
+    
+    this.continueButton.on('pointerdown', () => {
+        this.handleButtonClick(this.continueButton, "LevelMenu", { clearLocalStorage: false });
+    });
   }
 
-  handleButtonClick(button: GameObjects.Image, sceneKey: string,data: object = {}): void {
-      this.tweens.add({
-          targets: button,
-          y: button.y + 15,
-          duration: 100,
-          ease: 'Power2',
-          yoyo: true,
-          onComplete: () => {
-              this.cameras.main.fadeOut(250);
-              this.cameras.main.once('camerafadeoutcomplete', () => {
-              this.scene.start(sceneKey,{levelNumber: this.levelNumber});           
-              });
-          }
-      });
-  }
-
+  handleButtonClick(button: Phaser.GameObjects.Image, sceneKey: string, data: ButtonClickData = { clearLocalStorage: false }): void {
+    this.tweens.add({
+        targets: button,
+        y: button.y + 15,
+        duration: 100,
+        ease: 'Power2',
+        yoyo: true,
+        onComplete: () => {
+            if (data.clearLocalStorage) {
+                localStorage.clear();
+            }
+            this.cameras.main.fadeOut(250);
+            this.cameras.main.once('camerafadeoutcomplete', () => {
+                this.scene.start(sceneKey, { levelNumber: this.levelNumber });
+            });
+        }
+    });
+}
   update(): void {
   }
 }

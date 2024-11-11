@@ -237,8 +237,10 @@ onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image)
     this.arrowFill = this.add.image(gameObject.x, gameObject.y, 'arrow_fill')
         .setOrigin(0.5, 0.5)
         .setDisplaySize(50, 8);
+
     // this.line = this.add.line(0, 0, gameObject.x, gameObject.y, worldPoint.x, worldPoint.y, 0x000000);
     // this.line.setLineWidth(2);
+    
     this.cameras.main.stopFollow();
 }
 onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Image) {
