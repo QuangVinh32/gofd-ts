@@ -300,8 +300,8 @@ onDragEnd(pointer: Phaser.Input.Pointer, gameObject:LaunchableSprite) {
     const directionX = worldPoint.x - gameObject.x;
     const directionY = worldPoint.y - gameObject.y;
 
-    const velocityX = -directionX * 0.1;
-    const velocityY = -directionY * 0.1;
+    const velocityX = -directionX * 0.15;
+    const velocityY = -directionY * 0.15;
 
     if (gameObject.body) {
         gameObject.setVelocity(velocityX, velocityY);
@@ -312,12 +312,14 @@ onDragEnd(pointer: Phaser.Input.Pointer, gameObject:LaunchableSprite) {
     this.cameraFollowingBall = true;
     this.cameras.main.startFollow(gameObject);
 
-
-
-
-    this.score -= 100; 
+    if (this.score > 0) {
+        this.score -= 100;
+        if (this.score < 0) {
+            this.score = 0;
+        }
+    }
     console.log(`Launch count: ${gameObject.launch}`);
-    console.log(`Score: ${this.score}`); 
+    console.log(`Score: ${this.score}`);
 
     if (!gameObject.launch) {
         gameObject.launch = 0;

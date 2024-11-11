@@ -13,6 +13,8 @@ export class ScoreboardScene extends Phaser.Scene {
     private highestStar: number = 0;
     private isUnlocked: boolean = false;
     private isHoleAchieved: boolean = false;
+    private isRestarting: boolean = false;
+
 
     constructor() {
         super("scoreboard");
@@ -77,10 +79,19 @@ export class ScoreboardScene extends Phaser.Scene {
     }
 
     restartGame(): void {
+        const nextLevelNumber = this.levelNumber + 1;
+        const currentHighestLevel = parseInt(localStorage.getItem('highestLevelUnlocked') || '1', 10);
+
+        if (nextLevelNumber > currentHighestLevel) {
+            localStorage.setItem('highestLevelUnlocked', nextLevelNumber.toString());
+        }
+ 
+        console.log(`Resuming to level ${nextLevelNumber}...`);
+        if (this.isRestarting) return; 
+        this.isRestarting = true;
         this.cameras.main.fadeOut(250, 0, 0, 0);
         this.cameras.main.once('camerafadeoutcomplete', () => {
-            // this.scene.stop("scoreboard");  // Dừng cảnh scoreboard hiện tại
-            // this.scene.stop("uiScene");     // Dừng cảnh uiScene hiện tại
+            this.isRestarting = false; // Reset lại cờ để có thể gọi lại restart nếu cần
             this.scene.start("Levels");     // Khởi động lại màn Levels
             this.scene.start("uiScene");    // Khởi động lại uiScene
             // console.log("Game restarting...");

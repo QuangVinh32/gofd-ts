@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import PlayerLevelResultService from '../Services/PlayerLevelResultService';
 import SettingService from "../Services/SettingService"
-
 export default class MenuLevelScene extends Phaser.Scene {
     private levelResultService: PlayerLevelResultService;
     private settingService!: SettingService; 
@@ -67,9 +66,11 @@ export default class MenuLevelScene extends Phaser.Scene {
                 duration: 150,
                 yoyo: true,
                 onComplete: () => {
-                    this.isTweening = false;
-                    this.scene.start("playGame");
-
+                    this.cameras.main.fadeOut(250);
+                    this.cameras.main.once('camerafadeoutcomplete', () => {
+                        this.isTweening = false;
+                        this.scene.start("playGame");                    
+                    });
                 }
                 });
             }
@@ -86,7 +87,7 @@ export default class MenuLevelScene extends Phaser.Scene {
 
         for (let i = 1; i <= highestLevelUnlocked; i++) {
         const levelData = levelResults[i] || [];
-        const score = levelData[2] || 0;  // Giả định điểm cao nhất là phần tử thứ 3 (index 2)
+        const score = levelData[2] || 0;
             totalScore += score;
         }
         // Hiển thị tổng điểm
@@ -118,7 +119,8 @@ export default class MenuLevelScene extends Phaser.Scene {
 
                 for (let j = 1; j <= 3; j++) {
                     let starFrame = j <= stars ? 0 : 1;
-                    let star = this.add.sprite((j - 2) * 17, -25, 'star')
+                    let yOffset = j === 2 ? -2 : 0; 
+                    let star = this.add.sprite((j - 2) * 17, -25 + yOffset, 'star')
                         .setFrame(starFrame)
                         .setOrigin(0.5, 0.5)
                         .setDisplaySize(20, 20);
@@ -129,7 +131,8 @@ export default class MenuLevelScene extends Phaser.Scene {
             singleButtonGroup.add(scoreText);
             } else {
                 for (let j = 1; j <= 3; j++) {
-                    let star = this.add.sprite((j - 2) * 17, -25, 'star')
+                    let yOffset = j === 2 ? -2 : 0; 
+                    let star = this.add.sprite((j - 2) * 17, -25 + yOffset, 'star')
                         .setFrame(1)
                         .setOrigin(0.5, 0.5)
                         .setDisplaySize(20, 20);
@@ -186,8 +189,6 @@ export default class MenuLevelScene extends Phaser.Scene {
         });
     }
     
-    
-
     getHighestLevelUnlocked(): number {
         const highestLevel = localStorage.getItem('highestLevelUnlocked');
         let levelUnlocked = highestLevel ? parseInt(highestLevel, 10) : 1;   
