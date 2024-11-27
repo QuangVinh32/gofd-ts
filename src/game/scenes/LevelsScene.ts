@@ -94,33 +94,33 @@
                 this.pressIndicator.setDisplaySize(ballWidth / 2.7 , ballHeight / 2.7);
 
 
-                // this.time.addEvent({
-                //     delay: 1000,
-                //     callback: () => {
-                //         if (this.pressIndicator && !this.isTweening) {
-                //             this.isTweening = true;
-                //             this.tweens.add({
-                //                 targets: this.pressIndicator,
-                //                 scaleX: 0.3,
-                //                 scaleY: 0.3,
-                //                 alpha: 0,
-                //                 ease: 'Power2',
-                //                 duration: 700,
-                //                 yoyo: false,
-                //                 repeat: 0,
-                //                 onComplete: () => {
-                //                     if (this.pressIndicator) {
-                //                         this.pressIndicator.setAlpha(0.8);
-                //                         this.pressIndicator.setScale(0.1);
-                //                     }
-                //                     this.isTweening = false;
-                //                 }
-                //             });
-                //         }
-                //     },
-                //     loop: true
-                // });
-                //
+                this.time.addEvent({
+                    delay: 1000,
+                    callback: () => {
+                        if (this.pressIndicator && !this.isTweening) {
+                            this.isTweening = true;
+                            this.tweens.add({
+                                targets: this.pressIndicator,
+                                scaleX: 0.3,
+                                scaleY: 0.3,
+                                alpha: 0,
+                                ease: 'Power2',
+                                duration: 700,
+                                yoyo: false,
+                                repeat: 0,
+                                onComplete: () => {
+                                    if (this.pressIndicator) {
+                                        this.pressIndicator.setAlpha(0.8);
+                                        this.pressIndicator.setScale(0.1);
+                                    }
+                                    this.isTweening = false;
+                                }
+                            });
+                        }
+                    },
+                    loop: true
+                });
+                
 
             }
         }
@@ -445,7 +445,7 @@
         
         }
         update() {
-            // this.checkBallMotion();
+            this.checkBallMotion();
         }
         }
             
