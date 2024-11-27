@@ -91,13 +91,10 @@ class EditorPolygon extends Phaser.Scene {
             this.isPaused = !this.isPaused;
             console.log("Toggled pause:", this.isPaused);
         }
-    
         if (this.keyW && Phaser.Input.Keyboard.JustDown(this.keyW)) {
             this.savePointsToFile(); 
         }
     }
-    
-
     addPoint(pointer: Phaser.Input.Pointer): void {
         if (this.isPaused) return;
 

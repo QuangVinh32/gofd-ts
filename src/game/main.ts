@@ -13,8 +13,17 @@ const config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
     width: 650,
     height: 500,
-    parent: 'game-container',
+    parent: 'phaser-example',
     backgroundColor: '#000000',
+
+
+
+    scale: {
+        mode: Phaser.Scale.FIT, 
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
+  
+    //hello
     physics: {
         default: 'matter',
         matter: {
@@ -22,7 +31,9 @@ const config: Phaser.Types.Core.GameConfig = {
                 x: 0, 
                 y: 0  
             },
-            debug: false
+            // debug: false
+            // debugShowVelocity: false
+
         }
     },
 
